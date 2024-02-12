@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Typography,
@@ -13,55 +14,43 @@ import { CheckCircle, Loop, EventRepeat } from "@mui/icons-material";
 import Header from "../../app/common/components/Header";
 import TaskCard from "../HomePage/TaskCard";
 import Task from "../../models/TaskProps";
-import { useState } from "react";
+import TaskAPI from "../../app/api/Tasks/tasks.api";
 
 const HomePage = () => {
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      title: "Write blog post",
-      description: "Research and write about React best practices",
-      status: "Not Started",
-      startDate: "2024-02-10T08:00",
-      endDate: "2024-02-11T08:00",
-    },
-    {
-      title: "Design new UI",
-      description: "Create wireframes and mockups for the landing page",
-      status: "In Progress",
-      startDate: "2024-02-12T08:00",
-      endDate: "2024-02-15T08:00",
-    },
-    {
-      title: "Review code changes",
-      description:
-        "Check pull requests and provide feedback. Check pull requests and provide feedback. Check pull requests and provide feedback. Check pull requests and provide feedback. Check pull requests and provide feedback. Check pull requests and provide feedback. Check pull requests and provide feedback.",
-      status: "Done",
-      startDate: "2024-02-16T08:00",
-      endDate: "2024-02-20T08:00",
-    },
-    {
-      title: "Write blog post",
-      description: "Research and write about React best practices",
-      status: "Not Started",
-      startDate: "2024-02-10T08:00",
-      endDate: "2024-02-11T08:00",
-    },
-    {
-      title: "Design new UI",
-      description: "Create wireframes and mockups for the landing page",
-      status: "In Progress",
-      startDate: "2024-02-12T08:00",
-      endDate: "2024-02-15T08:00",
-    },
-    {
-      title: "Review code changes",
-      description:
-        "Check pull requests and provide feedback. Check pull requests and provide feedback. Check pull requests and provide feedback. Check pull requests and provide feedback. Check pull requests and provide feedback. Check pull requests and provide feedback. Check pull requests and provide feedback.",
-      status: "Done",
-      startDate: "2024-02-16T08:00",
-      endDate: "2024-02-20T08:00",
-    },
-  ]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        console.log("yeyy", tasks);
+        const response = await TaskAPI.getAll();
+        console.log("response:", response);
+        const transformedTasks = response.map(
+          (dto: {
+            id: any;
+            title: any;
+            description: any;
+            status: any;
+            startDate: any;
+            endDate: any;
+          }) => ({
+            id: dto.id,
+            title: dto.title,
+            description: dto.description,
+            status: dto.status,
+            startDate: dto.startDate,
+            endDate: dto.endDate,
+          })
+        );
+        setTasks(transformedTasks);
+        console.log("final", tasks);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
+    };
+
+    fetchTasks();
+  }, [tasks]);
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -69,28 +58,39 @@ const HomePage = () => {
       behavior: "smooth",
     });
   };
-  
-  const renderTaskCards = (status: string, mcolor: string) => {
+
+  const sectionTitles: { [key: number]: string } = {
+    0: "To Do",
+    1: "In Progress",
+    2: "Done",
+  };
+
+  const renderTaskCards = (status: number, mcolor: string) => {
+    const sectionTitle = sectionTitles[status];
+
+    if (!tasks) {
+      return null;
+    }
     const statusIcon =
-      status === "Not Started" ? (
+      status === 0 ? (
         <EventRepeat sx={{ color: mcolor }} />
-      ) : status === "In Progress" ? (
+      ) : status === 1 ? (
         <Loop sx={{ color: mcolor }} />
       ) : (
         <CheckCircle sx={{ color: mcolor }} />
       );
     const filteredTasks = tasks.filter((task) => task.status === status);
 
-    const moveTask = (
-      task: Task,
-      status: "Not Started" | "In Progress" | "Done"
-    ) => {
+    const moveTask = (task: Task, newStatus: number) => {
+      task.status = newStatus;
+
       const updatedTasks = tasks.map((t) => {
         if (t === task) {
-          return { ...t, status };
+          return task;
         }
         return t;
       });
+
       setTasks(updatedTasks);
     };
 
@@ -114,7 +114,7 @@ const HomePage = () => {
               display: "flex",
             }}
           >
-            {status}
+            {sectionTitle}
             {statusIcon}
           </Typography>
           <Box mt={2}>
@@ -137,13 +137,13 @@ const HomePage = () => {
       <Header />
       <Grid container spacing={4}>
         <Grid item xs={12} sm={12} md={4}>
-          {renderTaskCards("Not Started", "#9E9FA5")}
+          {renderTaskCards(0, "#9E9FA5")}
         </Grid>
         <Grid item xs={12} sm={12} md={4}>
-          {renderTaskCards("In Progress", "#6FB2D2")}
+          {renderTaskCards(1, "#6FB2D2")}
         </Grid>
         <Grid item xs={12} sm={12} md={4}>
-          {renderTaskCards("Done", "#85C88A")}
+          {renderTaskCards(2, "#85C88A")}
         </Grid>
       </Grid>
       <Zoom in={true}>

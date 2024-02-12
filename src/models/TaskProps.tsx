@@ -1,7 +1,8 @@
 export default interface Task {
+    id: number;
     title: string;
     description: string;
-    status: "Not Started" | "In Progress" | "Done";
+    status: number;
     startDate: string; 
     endDate: string; 
 }

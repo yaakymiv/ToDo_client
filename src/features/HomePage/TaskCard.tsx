@@ -16,14 +16,12 @@ import Task from "../../models/TaskProps";
 import { useState } from "react";
 import ColorCircle from "./ColorCircle";
 import formatDateTime from "../../app/common/components/FormatDateTime";
+import TaskAPI from "../../app/api/Tasks/tasks.api";
 
 const TaskCard: React.FC<{
   task: Task;
   mcolor: string;
-  moveTask: (
-    task: Task,
-    status: "Not Started" | "In Progress" | "Done"
-  ) => void;
+  moveTask: (task: Task, status: number) => void;
 }> = ({ task, mcolor, moveTask }) => {
   const { title, description, startDate, endDate } = task;
   const [expanded, setExpanded] = useState(false);
@@ -43,18 +41,21 @@ const TaskCard: React.FC<{
     setExpanded(!expanded);
   };
 
-  const handleMoveTask = (status: "Not Started" | "In Progress" | "Done") => {
+  const handleMoveTask = (status: number) => {
     moveTask(task, status);
   };
 
   const handleEditTask = (editedTask: Task) => {
-    // Implement logic to edit task
     console.log("Editing task:", editedTask);
   };
 
-  const handleDeleteTask = (taskToDelete: Task) => {
-    // Implement logic to delete task
-    console.log("Deleting task:", taskToDelete);
+  const handleDeleteTask = async (taskToDelete: Task) => {
+    try {
+      await TaskAPI.delete(taskToDelete.id);
+      console.log("Task deleted successfully:", taskToDelete);
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
   };
 
   return (
@@ -98,19 +99,19 @@ const TaskCard: React.FC<{
               {mcolor !== "#9E9FA5" && (
                 <ColorCircle
                   color="#9E9FA5"
-                  onClick={() => handleMoveTask("Not Started")}
+                  onClick={() => handleMoveTask(0)}
                 />
               )}
               {mcolor !== "#6FB2D2" && (
                 <ColorCircle
                   color="#6FB2D2"
-                  onClick={() => handleMoveTask("In Progress")}
+                  onClick={() => handleMoveTask(1)}
                 />
               )}
               {mcolor !== "#85C88A" && (
                 <ColorCircle
                   color="#85C88A"
-                  onClick={() => handleMoveTask("Done")}
+                  onClick={() => handleMoveTask(2)}
                 />
               )}
             </Box>
