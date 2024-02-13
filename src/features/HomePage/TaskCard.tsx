@@ -17,6 +17,7 @@ import { useState } from "react";
 import ColorCircle from "./ColorCircle";
 import formatDateTime from "../../app/common/components/FormatDateTime";
 import TaskAPI from "../../app/api/Tasks/tasks.api";
+import UpdateTaskDialog from "./UpdateTaskDialog";
 
 const TaskCard: React.FC<{
   task: Task;
@@ -25,9 +26,14 @@ const TaskCard: React.FC<{
 }> = ({ task, mcolor, moveTask }) => {
   const { title, description, startDate, endDate } = task;
   const [expanded, setExpanded] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
-  const formattedStartDate: string = formatDateTime(startDate);
-  const formattedEndDate: string = formatDateTime(endDate);
+  const formattedStartDate: string | undefined = startDate
+    ? formatDateTime(startDate)
+    : "";
+  const formattedEndDate: string | undefined = endDate
+    ? formatDateTime(endDate)
+    : "";
 
   const buttonStyle = {
     color: mcolor,
@@ -45,8 +51,8 @@ const TaskCard: React.FC<{
     moveTask(task, status);
   };
 
-  const handleEditTask = (editedTask: Task) => {
-    console.log("Editing task:", editedTask);
+  const handleEditTask = () => {
+    setEditDialogOpen(true);
   };
 
   const handleDeleteTask = async (taskToDelete: Task) => {
@@ -65,10 +71,15 @@ const TaskCard: React.FC<{
           {title}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {expanded ? description : `${description.slice(0, 100)}`}
-          {description.length > 100 && !expanded && "..."}
+          {expanded
+            ? description
+            : description
+            ? `${description.slice(0, 100)}`
+            : ""}
+          {description && description.length > 100 && !expanded && "..."}
         </Typography>
-        {!expanded && description.length > 100 && (
+
+        {!expanded && description && description.length > 100 && (
           <Button
             onClick={toggleExpand}
             size="small"
@@ -78,6 +89,7 @@ const TaskCard: React.FC<{
             Expand
           </Button>
         )}
+
         {expanded && (
           <Button
             onClick={toggleExpand}
@@ -117,7 +129,7 @@ const TaskCard: React.FC<{
             </Box>
             <Box>
               <IconButton
-                onClick={() => handleEditTask(task)}
+                onClick={() => handleEditTask()}
                 style={{ margin: 4, padding: 0 }}
                 sx={{
                   color: "black",
@@ -163,6 +175,11 @@ const TaskCard: React.FC<{
           </Box>
         </Box>
       </CardContent>
+      <UpdateTaskDialog
+        open={editDialogOpen}
+        handleClose={() => setEditDialogOpen(false)}
+        task={task}
+      />
     </Card>
   );
 };
