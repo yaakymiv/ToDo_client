@@ -4,24 +4,22 @@ import Task from "../../models/TaskProps";
 import TaskAPI from "../../app/api/Tasks/tasks.api";
 import TaskFormDialog from "../../app/common/components/TaskFormDialog";
 
-interface UpdateTaskDialogProps {
+interface AddTaskDialogProps {
   open: boolean;
   handleClose: () => void;
-  task: Task;
 }
 
-const UpdateTaskDialog: React.FC<UpdateTaskDialogProps> = ({
-  open,
-  handleClose,
-  task,
-}) => {
+const AddTaskDialog: React.FC<AddTaskDialogProps> = ({ open, handleClose }) => {
   const submitForm: SubmitHandler<Task> = async (data) => {
     try {
-      const updatedData = { ...task, ...data, status: Number(data.status) };
-      await TaskAPI.update("api/Task/Update", updatedData);
+      console.log(data);
+      if (!data.startDate) delete data.startDate;
+      if (!data.endDate) delete data.endDate;
 
+      await TaskAPI.create(data);
       handleClose();
     } catch (error: any) {
+      console.log(data);
       console.log(error);
     }
   };
@@ -31,11 +29,10 @@ const UpdateTaskDialog: React.FC<UpdateTaskDialogProps> = ({
       open={open}
       handleClose={handleClose}
       submitHandler={submitForm}
-      defaultValues={task}
-      title="Update Task"
-      submitButtonText="Update"
+      title="Add New Task"
+      submitButtonText="Add"
     />
   );
 };
 
-export default UpdateTaskDialog;
+export default AddTaskDialog;

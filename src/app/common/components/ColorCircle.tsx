@@ -1,5 +1,5 @@
 import { IconButton } from "@mui/material";
-import ColorCircleProps from "../../models/ColorCircleProps";
+import ColorCircleProps from "../../../models/ColorCircleProps";
 
 const ColorCircle: React.FC<ColorCircleProps> = ({ color, onClick }) => (
     <IconButton

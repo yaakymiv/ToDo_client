@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import  { useState } from 'react';
+import { Box, Button } from '@mui/material';
 import AddTaskDialog from './AddTaskDialog';
 
 const AddTask = () => {
@@ -10,6 +10,7 @@ const AddTask = () => {
   };
 
   const handleClose = () => {
+    
     setOpen(false);
   };
 

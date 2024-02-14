@@ -14,7 +14,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Task from "../../models/TaskProps";
 import { useState } from "react";
-import ColorCircle from "./ColorCircle";
+import ColorCircle from "../../app/common/components/ColorCircle";
 import formatDateTime from "../../app/common/components/FormatDateTime";
 import TaskAPI from "../../app/api/Tasks/tasks.api";
 import UpdateTaskDialog from "./UpdateTaskDialog";

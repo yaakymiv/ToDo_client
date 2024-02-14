@@ -13,48 +13,44 @@ import {
   Grid,
   Box,
 } from "@mui/material";
-import AddTaskDialogProps from "../../../models/AddTaskDialogProps";
-import TaskAPI from "../../api/Tasks/tasks.api";
+import Task from "../../../models/TaskProps";
 
-interface TaskFormData {
+interface TaskFormDialogProps {
+  open: boolean;
+  handleClose: () => void;
+  submitHandler: SubmitHandler<Task>;
+  defaultValues?: Partial<Task>;
   title: string;
-  description?: string;
-  startDate?: string;
-  endDate?: string;
-  status: number;
+  submitButtonText: string;
+  resetForm?: () => void;
 }
 
-const AddTaskDialog: React.FC<AddTaskDialogProps> = ({ open, handleClose }) => {
+const TaskFormDialog: React.FC<TaskFormDialogProps> = ({
+  open,
+  handleClose,
+  submitHandler,
+  defaultValues = {},
+  title,
+  submitButtonText,
+}) => {
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<TaskFormData>();
+  } = useForm<Task>({ defaultValues });
 
-  const submitForm: SubmitHandler<TaskFormData> = async (data) => {
-    try {
-      console.log(data);
-      if (!data.startDate) delete data.startDate;
-      if (!data.endDate) delete data.endDate;
-
-      await TaskAPI.create(data);
-      reset();
-      handleClose();
-    } catch (error: any) {
-      console.log(data);
-      console.log(error);
-    }
-  };
-
-  const defaultStatus = 0;
   const [endDate, setEndDate] = useState<string | undefined>();
   const [startDate, setStartDate] = useState<string | undefined>();
 
+  const handleCancel =()=>{
+    handleClose();
+    reset();
+  }
   return (
-    <Dialog open={open} onClose={handleClose}>
-      <form onSubmit={handleSubmit(submitForm)} noValidate>
-        <DialogTitle>Add New Task</DialogTitle>
+    <Dialog open={open} onClose={handleCancel}>
+      <form onSubmit={handleSubmit(submitHandler)} noValidate>
+        <DialogTitle>{title}</DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
             <Grid item xs={12} sx={{ mt: 0.8 }}>
@@ -81,7 +77,7 @@ const AddTaskDialog: React.FC<AddTaskDialogProps> = ({ open, handleClose }) => {
                 type="datetime-local"
                 fullWidth
                 InputLabelProps={{ shrink: true }}
-                InputProps ={{ inputProps:{max:endDate}}}
+                InputProps={{ inputProps: { max: endDate } }}
                 onChange={(e) => setStartDate(e.target.value)}
               />
             </Grid>
@@ -92,7 +88,7 @@ const AddTaskDialog: React.FC<AddTaskDialogProps> = ({ open, handleClose }) => {
                 type="datetime-local"
                 fullWidth
                 InputLabelProps={{ shrink: true }}
-                InputProps ={{ inputProps:{min:startDate}}}
+                InputProps={{ inputProps: { min: startDate } }}
                 onChange={(e) => setEndDate(e.target.value)}
               />
             </Grid>
@@ -100,9 +96,9 @@ const AddTaskDialog: React.FC<AddTaskDialogProps> = ({ open, handleClose }) => {
               <FormControl fullWidth>
                 <InputLabel id="status-label">Status</InputLabel>
                 <Select
-                  {...register("status")}
+                 {...register("status", { value: defaultValues.status || 0 })}
                   label="Status"
-                  defaultValue={defaultStatus}
+                  defaultValue={defaultValues.status || 0}
                 >
                   <MenuItem value={0}>To Do</MenuItem>
                   <MenuItem value={1}>In Progress</MenuItem>
@@ -112,10 +108,10 @@ const AddTaskDialog: React.FC<AddTaskDialogProps> = ({ open, handleClose }) => {
             </Grid>
           </Grid>
         </DialogContent>
-        <Box sx={{display:'flex',flexDirection:'column'}}>
-          <Button onClick={handleClose}>Cancel</Button>
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          <Button onClick={handleCancel}>Cancel</Button>
           <Button type="submit" sx={{ mb: 1.5 }}>
-            Add
+            {submitButtonText}
           </Button>
         </Box>
       </form>
@@ -123,4 +119,4 @@ const AddTaskDialog: React.FC<AddTaskDialogProps> = ({ open, handleClose }) => {
   );
 };
 
-export default AddTaskDialog;
+export default TaskFormDialog;
