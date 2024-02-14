@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
   Dialog,
@@ -42,6 +42,9 @@ const UpdateTaskDialog: React.FC<UpdateTaskDialogProps> = ({
     }
   };
 
+  const [endDate, setEndDate] = useState<string | undefined>();
+  const [startDate, setStartDate] = useState<string | undefined>();
+
   return (
     <Dialog open={open} onClose={handleClose}>
       <form onSubmit={handleSubmit(submitForm)} noValidate>
@@ -75,6 +78,8 @@ const UpdateTaskDialog: React.FC<UpdateTaskDialogProps> = ({
                 fullWidth
                 InputLabelProps={{ shrink: true }}
                 defaultValue={task.startDate}
+                InputProps ={{ inputProps:{max:endDate}}}
+                onChange={(e) => setStartDate(e.target.value)}
               />
             </Grid>
             <Grid item xs={6}>
@@ -85,6 +90,8 @@ const UpdateTaskDialog: React.FC<UpdateTaskDialogProps> = ({
                 fullWidth
                 InputLabelProps={{ shrink: true }}
                 defaultValue={task.endDate}
+                InputProps ={{ inputProps:{min:startDate}}}
+                onChange={(e) => setEndDate(e.target.value)}
               />
             </Grid>
             <Grid item xs={12}>
