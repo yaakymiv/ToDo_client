@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
   Dialog,
@@ -40,13 +40,22 @@ const TaskFormDialog: React.FC<TaskFormDialogProps> = ({
     formState: { errors },
   } = useForm<Task>({ defaultValues });
 
-  const [endDate, setEndDate] = useState<string | undefined>();
-  const [startDate, setStartDate] = useState<string | undefined>();
+  const [endDate, setEndDate] = useState<string | undefined>(
+    defaultValues.endDate || ""
+  );
+  const [startDate, setStartDate] = useState<string | undefined>(
+    defaultValues.startDate || ""
+  );
 
-  const handleCancel =()=>{
+  useEffect(() => {
+    setStartDate(defaultValues.startDate || "");
+    setEndDate(defaultValues.endDate || "");
+  }, [defaultValues]);
+
+  const handleCancel = () => {
     handleClose();
     reset();
-  }
+  };
   return (
     <Dialog open={open} onClose={handleCancel}>
       <form onSubmit={handleSubmit(submitHandler)} noValidate>
@@ -96,7 +105,7 @@ const TaskFormDialog: React.FC<TaskFormDialogProps> = ({
               <FormControl fullWidth>
                 <InputLabel id="status-label">Status</InputLabel>
                 <Select
-                 {...register("status", { value: defaultValues.status || 0 })}
+                  {...register("status", { value: defaultValues.status || 0 })}
                   label="Status"
                   defaultValue={defaultValues.status || 0}
                 >
